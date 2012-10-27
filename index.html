@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Sample web app</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    	<style>
+			div#containerDiv
+			{
+				position: fixed;
+				_position: absolute;
+				_top:expression(eval(document.body.scrollTop));
+				width: 100%;
+				height: 100%;
+				top: 0px;
+				left: 0px;
+ 			}    		
+    	</style>
+	</head>
+	<body style="margin:0px">
+		<div id="containerDiv">
+			<object data="preloader.html" type="text/html" height="100%" width="100%"></object>
+		</div>
+	</body>
+</html>
