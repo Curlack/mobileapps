@@ -1,303 +1,319 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>
-		Production Performance
-	</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-	<link rel="stylesheet" href="style/mobile/jquery.mobile-1.1.1.min.css" type="text/css" />
-	<link rel="stylesheet" href="style/custom-button.css" type="text/css" />
-	<link rel="stylesheet" href="style/jquery.marquee.min.css" type="text/css" />
-	<link rel="stylesheet" href="style/navbar.css" type="text/css" />
-	<link rel="stylesheet" href="style/modal.css" type="text/css" />
-	<script type="text/javascript" src="script/localStorage.js"></script>
-	<script type="text/javascript" src="script/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript" src="script/jquery.marquee.min.js"></script>
-	<script type="text/javascript" src="script/mobile/jquery.mobile-1.1.1.min.js"></script>
-	<!--<script type="text/javascript" src="phonegap.js"></script>-->
-	<script type="text/javascript"><!--
-	jQuery.support.cors = true;
-	var prevSize;
-	var activeButton;
-	
-	$(document).ready(function (){
-		contentInit();
-		setMarqueeWidth();
-		initMarquee();
+    <head>
+        <title>Production Performance</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+        <link rel="stylesheet" href="style/mobile/jquery.mobile-1.1.1.min.css" type="text/css" />
+        <link rel="stylesheet" href="style/custom-button.css" type="text/css" />
+        <link rel="stylesheet" href="style/jquery.marquee.min.css" type="text/css" />
+        <link rel="stylesheet" href="style/navbar.css" type="text/css" />
+        <link rel="stylesheet" href="style/modal.css" type="text/css" />
+        <script type="text/javascript" src="script/localStorage.js">
+        </script>
+        <script type="text/javascript" src="script/jquery-1.8.2.min.js">
+        </script>
+        <script type="text/javascript" src="script/jquery.marquee.min.js">
+        </script>
+        <script type="text/javascript" src="script/mobile/jquery.mobile-1.1.1.min.js">
+        </script>
+        <script type="text/javascript">
+            <!--
+            jQuery.support.cors = true;
+            var prevSize;
+            var activeButton;
+            
+            $(document).ready(function(){
+                var wnd = $(window);
+                var wndSize = function(){
+                    return wnd.innerWidth() + "x" + wnd.innerHeight();
+                };
+                prevSize = wndSize();
+                wnd.on("resize", function(){
+                    var curSize = wndSize();
+                    
+                    if (curSize === prevSize) 
+                        return;
+                    
+                    prevSize = curSize;
+                    // handler code
+                    setMarqueeWidth();
+                });
+                
+                //Button Click Events
+                $('#home').click(function(){
+                    setContent(0, null);
+                    localStorage.setItem('cIndex', 0);
+                    updateActiveButton($('#home'));
+                });
+                
+                $('#prodstats').click(function(){
+                    $.ajax({
+                        url: "http://curmobilack.phpfogapp.com/prodstats",
+                        dataType: 'jsonp',
+                        cache: 'false',
+                        beforeSend: function(){
+                            $("body").addClass("loading");
+                        },
+                        complete: function(){
+                            $("body").removeClass("loading");
+                        },
+                        success: function(response){
+                            setContent(1, response);
+                            localStorage.setItem('prodStats', JSON.stringify(response));
+                            localStorage.setItem('cIndex', 1);
+                            updateActiveButton($('#prodstats'));
+                        },
+                        error: function(){
+                            restoreActiveButton($('#prodstats'));
+                            alert("Error retrieving data");
+                        }
+                    });
+                });
+                
+                $('#marquee').click(function(){
+                    $.ajax({
+                        url: "http://curmobilack.phpfogapp.com/marquee",
+                        dataType: 'jsonp',
+                        cache: 'false',
+                        beforeSend: function(){
+                            $("body").addClass("loading");
+                        },
+                        complete: function(){
+                            $("body").removeClass("loading");
+                        },
+                        success: function(response){
+                            setContent(2, response);
+                            updateActiveButton($('#marquee'));
+                        },
+                        error: function(){
+                            restoreActiveButton($('#marquee'));
+                            alert("Error retrieving data");
+                        }
+                    });
+                });
+                
+                $('#exit').click(function(){
+                    window.open('', '_self');
+                    window.close();
+                });
 
-		//Button Click Events
-		$('#home').click(function() {
-			$("body").addClass("loading"); 
-			setContent(0,null);
-			localStorage.setItem('cIndex',0);
-			updateActiveButton($('#home'));
-		});
-		
-		$('#prodstats').click(function() {
-			$.ajax({
-				url:"http://curmobilack.phpfogapp.com/prodstats",
-				dataType: 'jsonp',
-				cache: 'false',
-				beforeSend: function(){
-					$("body").addClass("loading"); 
-				},
-				complete: function(){
-					$("body").removeClass("loading"); 
-				},
-				success:function(response){
-					setContent(1,response);
-					localStorage.setItem('prodStats',JSON.stringify(response));
-					localStorage.setItem('cIndex',1);
-					updateActiveButton($('#prodstats'));
-				},
-				error:function(){
-					restoreActiveButton($('#prodstats'));
-					alert("Error retrieving data");
-				}
-			});
-		});
-		
-		$('#marquee').click(function() {
-			$.ajax({
-				url:"http://curmobilack.phpfogapp.com/marquee",
-				dataType: 'jsonp',
-				cache: 'false',
-				beforeSend: function(){
-					$("body").addClass("loading"); 
-				},
-				complete: function(){
-					$("body").removeClass("loading"); 
-				},
-				success:function(response){
-					setContent(2,response);
-					updateActiveButton($('#marquee'));
-				},
-				error:function(){
-					restoreActiveButton($('#marquee'));
-					alert("Error retrieving data");
-				}
-			});
-		});
+                setMarqueeWidth();
+                initMarquee();
+				showLastPage();
+				$("body").removeClass('loading');
+            });
 
-		$('#exit').click(function() {
-			window.open('', '_self'); window.close();
-		});
-
-		$("body").removeClass('loading');
-	});
-
-	//Content Generation
-	function setContent(index, response) {
-		$('#currentView').empty() //Prevent memory leaks
-		switch (index) {
-			case 2: //Show message input table
-				var msgCount = 0;
-				var htmlValue = '<table id="marqueeTable" style="width:100%">';
-				if (response != null && response.success) {
-					$.each(response.marquee, function() {
-						msgCount++;
-						if (this.id != msgCount) {
-							while (msgCount != this.id) {
-								htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
-								msgCount++;
-							}
-						}
-						htmlValue += '<tr><td style="width:3px; text-align:right">' + this.id + '</td><td><input name="Text' + this.id + '" maxlength="50" type="text" value="' + this.text + '" /></td></tr>';
-					});
-				}
-				
-				while (msgCount < 15) {
-					msgCount++;
-					htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
-				}
-				
-				htmlValue += '</table><button id="btnSave" data-inline="true" data-theme="c" data-icon="check">Save</button>';
-				$('#currentView').html(htmlValue).trigger('create');
-				$('#btnSave').click(function() {
-					var msgs = '';
-					$('#marqueeTable input').each(function(index) {
-						var text = this.value;
-						if (text.length > 0) {
-							var id = parseFloat(this.name.replace("Text",""));
-							if (msgs.length == 0) {
-								msgs += '[{"id":' + id + ',"text":"' + text + '"}';
-							} else {
-								msgs += ',{"id":' + id + ',"text":"' + text + '"}';
-							}
-						}
-					});
-					msgs += "]";
-					
-					$.ajax({
-						type: "post",
-						url:"http://curmobilack.phpfogapp.com/marquee",
-						dataType: "json",
-						cache: "false",
-						data: {marquee:msgs},
-						beforeSend: function(){
-							$("body").addClass("loading"); 
-						},
-						complete: function(){
-							$("body").removeClass("loading"); 
-						},
-						success:function(response){
-							if (response == null || !response.success) {
-								alert("Error saving");
-							} else {
-								updateMarquee(response.marquee);
-								showLastPage();
-							}
-						},
-						error:function(response,statusText,errorThrown){
-							alert("Error posting");
-						}
-					});
-				});
-				break;
-			case 1: //Show Production Performance Data
-				if (response != null && response.success) {
-					var htmlValue = '<div data-role="collapsible-set">';
-					$.each(response.statsInfo, function() {
-						htmlValue += '<div data-role="collapsible" data-theme="' + this.values.state + '" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-inset="true" data-collapsed="true">';
-						htmlValue += '<h2>' + this.values.desc + '</h2>';
-						htmlValue += '<ul data-role="listview" data-theme="c" data-divider-theme="a" data-count-theme="d">';
-						$.each(this.values.items, function() {
-							htmlValue += '<li data-role="list-divider">' + this.values.desc + '<span class="ui-li-count"> (' + this.values.uom + ')</span></li>';
-							htmlValue += '<li><table><tr><td style="width: 70px; padding-right: 5px" align="right"><label>Actual</label></td>';
-							htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.actual + '" /></td></tr>';
-							htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>Planned</label></td>';
-							htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.planned + '" /></td></tr>';
-							htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>On Target</label></td>';
-							if (this.values.state) {
-								htmlValue += '<td><img src="images/yes.png"/></td></tr></table></li>';
-							} else {
-								htmlValue += '<td><img src="images/no.png"/></td></tr></table></li>';
-							}
-						});
-						htmlValue += '</ul></div>';
-					});
-					htmlValue += '</div>';
-					htmlValue += '<span>Last update : ' + response.lastUpdated + '</span><br>';
-					$('#currentView').html(htmlValue).trigger('create');
-				} else {
-					//No production performance data
-					$('#currentView').html('<span>No production performance data available</span>').trigger('create');
-				}
-				break;
-			case 0: //Show jWplayer
-			default:
-				$('#currentView').html('<object data="video.html" type="text/html" height="250" width="100%"></object>').trigger('create');
-				break;
-		}
-	}
-	
-	function contentInit() {
-		var wnd = $(window);
-		var wndSize = function() {
-			return wnd.innerWidth() + "x" + wnd.innerHeight();
-		};
-		prevSize = wndSize();
-		wnd.on("resize", function() {
-			var curSize =  wndSize();
-
-			if(curSize  === prevSize)
-				return;
-
-			prevSize = curSize;
-			// handler code
-			setMarqueeWidth();
-		});
-
-		//Content Setup
-		showLastPage();
-	}
-	
-	function showLastPage() {
-		if (activeButton != null) {
-			activeButton.removeClass('ui-btn-active');
-		}
-		var contentIndex = localStorage.getItem('cIndex');
-		if (contentIndex == null || contentIndex == 0) {
-			//Show corporate video content
-			setContent(0,null);
-			$('#home').addClass('ui-btn-active');
-			activeButton = $('#home');
-		} else {
-			//Show production performance content
-			var response = JSON.parse(localStorage.getItem('prodStats'));
-			setContent(1,response);
-			$('#prodstats').addClass('ui-btn-active');
-			activeButton = $('#prodstats');
-		}
-	}
-	
-	function setMarqueeWidth() {
-		var marqueeWidth = parseFloat(prevSize.substring(0, prevSize.indexOf("x")));
-		$("#scrolly").css("width", marqueeWidth.toString() + "px");
-	}
-	
-	function initMarquee(){
-		$.ajax({
-			url:"http://www.test.com/marquee",
-			dataType: 'jsonp',
-			cache: 'false',
-			success:function(response){
-				updateMarquee(response.marquee);
-			}
-		});
-	}	
-	
-	function updateMarquee(marquee) {
-		$('#scrolly').empty() //Prevent memory leaks
-		var htmlValue = '';
-		$.each(marquee, function() {
-			htmlValue += '<li>' + this.text + '</li>';
-		});
-		$('#scrolly').html(htmlValue).trigger('create');
-		$("#scrolly").marquee({yScroll: "bottom"});
-	}
-	
-	function updateActiveButton(newActiveButton) {
-		if (activeButton != newActiveButton) {
-			activeButton = newActiveButton;
-		}
-	}
-
-	function restoreActiveButton(newActiveButton) {
-		if (activeButton != newActiveButton) {
-			newActiveButton.removeClass('ui-btn-active');
-			activeButton.addClass('ui-btn-active');
-		}
-	}
-	//-->
-	</script>
-</head>
-<body class="loading">
-	<div data-role="page" data-theme="d">
-		<div data-role="header" data-position="fixed">
-			<div style="text-align:center; width: 100%; background: #FFFFFF" data-role="navbar">
-				<img src="images/evrazlogomobile.png" style="max-width:100%;max-height:100%" />
-			</div>
-			<div data-role="header" data-theme="e">
-				<ul id="scrolly" class="marquee">
-				</ul>			
-			</div>
-		</div>
-
-		<div id="currentView" data-role="content" data-theme="d"></div>
-
-		<div data-role="footer" style="z-index:1500" class="sitenav" data-theme="b" data-position="fixed"> 
-			<div data-role="navbar" class="sitenav"> 
-			<ul> 
-				<li><a href="#" id="home" data-icon="custom"></a></li> 
-				<li><a href="#" id="prodstats" data-icon="custom"></a></li> 
-				<li><a href="#" id="marquee" data-icon="custom"></a></li> 
-				<li><a href="#" id="exit" data-icon="custom"></a></li> 
-			</ul> 
-			</div> 
-		</div> 
-	</div>
-	<div class="modal"><!-- Place at bottom of page --></div>
-</body>
+            //Content Generation
+            function setContent(index, response){
+                $('#currentView').empty() //Prevent memory leaks
+                switch (index) {
+                    case 2: //Show message input table
+                        var msgCount = 0;
+                        var htmlValue = '<table id="marqueeTable" style="width:100%">';
+                        if (response != null && response.success) {
+                            $.each(response.marquee, function(){
+                                msgCount++;
+                                if (this.id != msgCount) {
+                                    while (msgCount != this.id) {
+                                        htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
+                                        msgCount++;
+                                    }
+                                }
+                                htmlValue += '<tr><td style="width:3px; text-align:right">' + this.id + '</td><td><input name="Text' + this.id + '" maxlength="50" type="text" value="' + this.text + '" /></td></tr>';
+                            });
+                        }
+                        
+                        while (msgCount < 15) {
+                            msgCount++;
+                            htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
+                        }
+                        
+                        htmlValue += '</table><button id="btnSave" data-inline="true" data-theme="c" data-icon="check">Save</button>';
+                        $('#currentView').html(htmlValue).trigger('create');
+                        $('#btnSave').click(function(){
+                            var msgs = '';
+                            $('#marqueeTable input').each(function(index){
+                                var text = this.value;
+                                if (text.length > 0) {
+                                    var id = parseFloat(this.name.replace("Text", ""));
+                                    if (msgs.length == 0) {
+                                        msgs += '[{"id":' + id + ',"text":"' + text + '"}';
+                                    }
+                                    else {
+                                        msgs += ',{"id":' + id + ',"text":"' + text + '"}';
+                                    }
+                                }
+                            });
+                            msgs += "]";
+                            
+                            $.ajax({
+                                type: "post",
+                                url: "http://curmobilack.phpfogapp.com/marquee",
+                                dataType: "json",
+                                cache: "false",
+                                data: {
+                                    marquee: msgs
+                                },
+                                beforeSend: function(){
+                                    $("body").addClass("loading");
+                                },
+                                complete: function(){
+                                    $("body").removeClass("loading");
+                                },
+                                success: function(response){
+                                    if (response == null || !response.success) {
+                                        alert("Error saving");
+                                    }
+                                    else {
+                                        updateMarquee(response.marquee);
+                                        showLastPage();
+                                    }
+                                },
+                                error: function(response, statusText, errorThrown){
+                                    alert("Error posting");
+                                }
+                            });
+                        });
+                        break;
+                    case 1: //Show Production Performance Data
+                        if (response != null && response.success) {
+                            var htmlValue = '<div data-role="collapsible-set">';
+                            $.each(response.statsInfo, function(){
+                                htmlValue += '<div data-role="collapsible" data-theme="' + this.values.state + '" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-inset="true" data-collapsed="true">';
+                                htmlValue += '<h2>' + this.values.desc + '</h2>';
+                                htmlValue += '<ul data-role="listview" data-theme="c" data-divider-theme="a" data-count-theme="d">';
+                                $.each(this.values.items, function(){
+                                    htmlValue += '<li data-role="list-divider">' + this.values.desc + '<span class="ui-li-count"> (' + this.values.uom + ')</span></li>';
+                                    htmlValue += '<li><table><tr><td style="width: 70px; padding-right: 5px" align="right"><label>Actual</label></td>';
+                                    htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.actual + '" /></td></tr>';
+                                    htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>Planned</label></td>';
+                                    htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.planned + '" /></td></tr>';
+                                    htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>On Target</label></td>';
+                                    if (this.values.state) {
+                                        htmlValue += '<td><img src="images/yes.png"/></td></tr></table></li>';
+                                    }
+                                    else {
+                                        htmlValue += '<td><img src="images/no.png"/></td></tr></table></li>';
+                                    }
+                                });
+                                htmlValue += '</ul></div>';
+                            });
+                            htmlValue += '</div>';
+                            htmlValue += '<span>Last update : ' + response.lastUpdated + '</span><br>';
+                            $('#currentView').html(htmlValue).trigger('create');
+                        }
+                        else {
+                            //No production performance data
+                            $('#currentView').html('<span>No production performance data available</span>').trigger('create');
+                        }
+                        break;
+                    case 0: //Show jWplayer
+                    default:
+                        $('#currentView').html('<iframe id="mediaplayer" src="http://curmobilack.phpfogapp.com/video.html" style="border: 0; width:300px; height:250px; z-index: 100; position: relative; left: -150px; margin-left: 50%;" />').trigger('create');
+                        break;
+                }
+				$("body").scrollTop(0);
+            }
+            
+            function showLastPage(){
+                if (activeButton != null) {
+                    activeButton.removeClass('ui-btn-active');
+                }
+                var contentIndex = localStorage.getItem('cIndex');
+                if (contentIndex == null || contentIndex == 0) {
+                    //Show corporate video content
+                    setContent(0, null);
+                    $('#home').addClass('ui-btn-active');
+                    activeButton = $('#home');
+                }
+                else {
+                    //Show production performance content
+                    var response = JSON.parse(localStorage.getItem('prodStats'));
+                    setContent(1, response);
+                    $('#prodstats').addClass('ui-btn-active');
+                    activeButton = $('#prodstats');
+                }
+            }
+            
+            function setMarqueeWidth(){
+                var marqueeWidth = parseFloat(prevSize.substring(0, prevSize.indexOf("x")));
+                $("#scrolly").css("width", marqueeWidth.toString() + "px");
+            }
+            
+            function initMarquee(){
+                $.ajax({
+                    url: "http://curmobilack.phpfogapp.com/marquee",
+                    dataType: 'jsonp',
+                    cache: 'false',
+                    success: function(response){
+                        updateMarquee(response.marquee);
+                    }
+                });
+            }
+            
+            function updateMarquee(marquee){
+                $('#scrolly').empty() //Prevent memory leaks
+                var htmlValue = '';
+                $.each(marquee, function(){
+                    htmlValue += '<li>' + this.text + '</li>';
+                });
+                $('#scrolly').html(htmlValue).trigger('create');
+                $("#scrolly").marquee({
+                    yScroll: "bottom"
+                });
+            }
+            
+            function updateActiveButton(newActiveButton){
+                if (activeButton != newActiveButton) {
+                    activeButton = newActiveButton;
+                }
+            }
+            
+            function restoreActiveButton(newActiveButton){
+                if (activeButton != newActiveButton) {
+                    newActiveButton.removeClass('ui-btn-active');
+                    activeButton.addClass('ui-btn-active');
+                }
+            }
+            
+            //-->
+        </script>
+    </head>
+    <body class="loading">
+        <div id="mainPage" data-role="page" data-theme="d">
+            <div data-role="header">
+                <div style="text-align:center; width: 100%; background: #FFFFFF" data-role="navbar">
+                    <img src="images/evrazlogomobile.png" style="max-width:100%;max-height:100%"/>
+                </div>
+	            <div data-role="header" data-theme="e">
+	                <ul id="scrolly" class="marquee" data-theme="e">
+	                </ul>
+	            </div>
+            </div>
+            <div id="currentView" data-role="content" data-theme="d">
+            </div>
+            <div data-role="footer" style="z-index:1500" class="sitenav" data-theme="b" data-position="fixed">
+                <div data-role="navbar" class="sitenav">
+                    <ul>
+                        <li>
+                            <a href="#" id="home" data-icon="custom"></a>
+                        </li>
+                        <li>
+                            <a href="#" id="prodstats" data-icon="custom"></a>
+                        </li>
+                        <li>
+                            <a href="#" id="marquee" data-icon="custom"></a>
+                        </li>
+                        <li>
+                            <a href="#" id="exit" data-icon="custom"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal">
+            <!-- Place at bottom of page -->
+        </div>
+    </body>
 </html>
