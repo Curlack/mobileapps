@@ -116,17 +116,17 @@
                                 msgCount++;
                                 if (this.id != msgCount) {
                                     while (msgCount != this.id) {
-                                        htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
+                                        htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="100" type="text" value="" /></td></tr>';
                                         msgCount++;
                                     }
                                 }
-                                htmlValue += '<tr><td style="width:3px; text-align:right">' + this.id + '</td><td><input name="Text' + this.id + '" maxlength="50" type="text" value="' + this.text + '" /></td></tr>';
+                                htmlValue += '<tr><td style="width:3px; text-align:right">' + this.id + '</td><td><input name="Text' + this.id + '" maxlength="100" type="text" value="' + this.text + '" /></td></tr>';
                             });
                         }
                         
                         while (msgCount < 15) {
                             msgCount++;
-                            htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="50" type="text" value="" /></td></tr>';
+                            htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="100" type="text" value="" /></td></tr>';
                         }
                         
                         htmlValue += '</table><button id="btnSave" data-inline="true" data-theme="c" data-icon="check">Save</button>';
