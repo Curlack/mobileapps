@@ -4,19 +4,15 @@
         <title>Production Performance</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-        <link rel="stylesheet" href="style/mobile/jquery.mobile-1.1.1.min.css" type="text/css" />
         <link rel="stylesheet" href="style/custom-button.css" type="text/css" />
         <link rel="stylesheet" href="style/jquery.marquee.min.css" type="text/css" />
+        <link rel="stylesheet" href="style/mobile/jquery.mobile-1.1.1.css" type="text/css" />
         <link rel="stylesheet" href="style/navbar.css" type="text/css" />
         <link rel="stylesheet" href="style/modal.css" type="text/css" />
-        <script type="text/javascript" src="script/localStorage.js">
-        </script>
-        <script type="text/javascript" src="script/jquery-1.8.2.min.js">
-        </script>
-        <script type="text/javascript" src="script/jquery.marquee.min.js">
-        </script>
-        <script type="text/javascript" src="script/mobile/jquery.mobile-1.1.1.min.js">
-        </script>
+        <script type="text/javascript" src="script/localStorage.js"></script>
+        <script type="text/javascript" src="script/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript" src="script/jquery.marquee.min.js"></script>
+        <script type="text/javascript" src="script/mobile/jquery.mobile-1.1.1.min.js"></script>
         <script type="text/javascript">
             <!--
             jQuery.support.cors = true;
@@ -24,6 +20,10 @@
             var activeButton;
             
             $(document).ready(function(){
+                $("#scrolly").marquee({
+                    yScroll: "bottom"
+                });
+
                 var wnd = $(window);
                 var wndSize = function(){
                     return wnd.innerWidth() + "x" + wnd.innerHeight();
@@ -94,9 +94,10 @@
                     });
                 });
                 
-                $('#exit').click(function(){
-                    window.open('', '_self');
-                    window.close();
+                $('#refresh').click(function(){
+                    //window.open('', '_self');
+                    //window.close();
+					window.location.reload();
                 });
 
                 setMarqueeWidth();
@@ -105,36 +106,55 @@
 				$("body").removeClass('loading');
             });
 
+			function textCounter( field, maxlimit ) {
+			  if ( field.value.length > maxlimit )
+			  {
+				field.value = field.value.substring( 0, maxlimit );
+				alert( 'Textarea value can only be 255 characters in length.' );
+				return false;
+			  }
+			}
+
             //Content Generation
             function setContent(index, response){
                 $('#currentView').empty() //Prevent memory leaks
+				$(window).scrollTop(0);
                 switch (index) {
                     case 2: //Show message input table
                         var msgCount = 0;
-                        var htmlValue = '<table id="marqueeTable" style="width:100%">';
+						var htmlValue = '<div class="ui-grid-a" id="marqueeTable">';
                         if (response != null && response.success) {
+							var countHtml = '<div class="ui-block-a" style="width:10%; text-align:center; margin-top: 15px">@msgCount</div>';
+							var textHtml = '<div class="ui-block-b" style="width:85%;"><textarea onkeypress="textCounter(this, 100);" style="overflow:hidden; width:100%;height:95%;" name="Text@msgCount">@msgText</textarea></div>';
                             $.each(response.marquee, function(){
                                 msgCount++;
                                 if (this.id != msgCount) {
                                     while (msgCount != this.id) {
-                                        htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="100" type="text" value="" /></td></tr>';
+                                        htmlValue += countHtml.replace('@msgCount',msgCount);
+                                        htmlValue += textHtml.replace('@msgCount',msgCount).replace('@msgText','');
                                         msgCount++;
                                     }
                                 }
-                                htmlValue += '<tr><td style="width:3px; text-align:right">' + this.id + '</td><td><input name="Text' + this.id + '" maxlength="100" type="text" value="' + this.text + '" /></td></tr>';
+                                htmlValue += countHtml.replace('@msgCount',this.id);
+                                htmlValue += textHtml.replace('@msgCount',this.id).replace('@msgText',this.text);
                             });
                         }
                         
                         while (msgCount < 15) {
                             msgCount++;
-                            htmlValue += '<tr><td style="width:3px; text-align:right">' + msgCount + '</td><td><input name="Text' + msgCount + '" maxlength="100" type="text" value="" /></td></tr>';
+							htmlValue += countHtml.replace('@msgCount',msgCount);
+							htmlValue += textHtml.replace('@msgCount',msgCount).replace('@msgText','');
                         }
                         
-                        htmlValue += '</table><button id="btnSave" data-inline="true" data-theme="c" data-icon="check">Save</button>';
+                        htmlValue += '</div><button id="btnSave" data-inline="true" data-theme="c" data-icon="check">Save</button>';
                         $('#currentView').html(htmlValue).trigger('create');
+						$('#marqueeTable textarea').each(function(index){
+							this.cols = parseInt(this.scrollWidth / 8);
+							this.rows = 1 + Math.floor( 100 / this.cols );
+						});
                         $('#btnSave').click(function(){
                             var msgs = '';
-                            $('#marqueeTable input').each(function(index){
+                            $('#marqueeTable textarea').each(function(index){
                                 var text = this.value;
                                 if (text.length > 0) {
                                     var id = parseFloat(this.name.replace("Text", ""));
@@ -186,17 +206,16 @@
                                 htmlValue += '<ul data-role="listview" data-theme="c" data-divider-theme="a" data-count-theme="d">';
                                 $.each(this.values.items, function(){
                                     htmlValue += '<li data-role="list-divider">' + this.values.desc + '<span class="ui-li-count"> (' + this.values.uom + ')</span></li>';
-                                    htmlValue += '<li><table><tr><td style="width: 70px; padding-right: 5px" align="right"><label>Actual</label></td>';
-                                    htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.actual + '" /></td></tr>';
-                                    htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>Planned</label></td>';
-                                    htmlValue += '<td><input readonly style="width: 93px" type="text" value="' + this.values.planned + '" /></td></tr>';
-                                    htmlValue += '<tr><td style="padding-right: 5px" align="right"><label>On Target</label></td>';
-                                    if (this.values.state) {
-                                        htmlValue += '<td><img src="images/yes.png"/></td></tr></table></li>';
-                                    }
-                                    else {
-                                        htmlValue += '<td><img src="images/no.png"/></td></tr></table></li>';
-                                    }
+									htmlValue += '<li><div class="ui-grid-b" style="height:48px">';
+									htmlValue += '<div class="ui-block-a"></div>';
+									htmlValue += '<div class="ui-block-b" style="text-align: center; margin-top:4px">Actual</div>';
+									htmlValue += '<div class="ui-block-c" style="text-align: center; margin-top:4px">Planned</div>';
+									htmlValue += '<div class="ui-block-a" style="text-align: center; position: relative; top: -20px">';
+                                    htmlValue += '<img src="images/' + (this.values.state ? 'yes' : 'no') + '.png"/>';
+									htmlValue += '</div>';
+									htmlValue += '<div class="ui-block-b" style="text-align: center; margin-top:4px">' + this.values.actual + '</div>';
+									htmlValue += '<div class="ui-block-c" style="text-align: center; margin-top:4px">' + this.values.planned + '</div>';
+									htmlValue += '</div></li>';
                                 });
                                 htmlValue += '</ul></div>';
                             });
@@ -206,15 +225,15 @@
                         }
                         else {
                             //No production performance data
-                            $('#currentView').html('<span>No production performance data available</span>').trigger('create');
+                            $('#currentView').html('<span>Production performance data unavailable</span>').trigger('create');
                         }
                         break;
                     case 0: //Show jWplayer
                     default:
-                        $('#currentView').html('<iframe id="mediaplayer" src="http://curmobilack.phpfogapp.com/video.html" style="border: 0; width:300px; height:250px; z-index: 100; position: relative; left: -150px; margin-left: 50%;" />').trigger('create');
+                        $('#currentView').html('<div style="position: relative; left: -150px; margin-left: 50%;" data-role="content"><iframe id="mediaplayer" src="http://curmobilack.phpfogapp.com/video.html" style="border: 0; width:300px; height:250px; z-index: 100;" /></div>').trigger('create');
                         break;
                 }
-				$("body").scrollTop(0);
+				$('#mainPage header').trigger('updatelayout');
             }
             
             function showLastPage(){
@@ -240,6 +259,11 @@
             function setMarqueeWidth(){
                 var marqueeWidth = parseFloat(prevSize.substring(0, prevSize.indexOf("x")));
                 $("#scrolly").css("width", marqueeWidth.toString() + "px");
+				
+				$('#marqueeTable textarea').each(function(index){
+					this.cols = parseInt(this.scrollWidth / 8);
+					this.rows = 1 + Math.floor( 100 / this.cols );
+				});
             }
             
             function initMarquee(){
@@ -249,7 +273,11 @@
                     cache: 'false',
                     success: function(response){
                         updateMarquee(response.marquee);
-                    }
+                    },
+					error: function(response, statusText, errorThrown){
+						updateMarquee(JSON.parse('[{"id":"1","text":"An error occured retrieving the marquee data"},' +
+												'{"id":"2","text":"Please check you internet connection and try again"}]'));
+					}
                 });
             }
             
@@ -287,10 +315,9 @@
                 <div style="text-align:center; width: 100%; background: #FFFFFF" data-role="navbar">
                     <img src="images/logo.png" style="max-width:100%;max-height:100%"/>
                 </div>
-	            <div data-role="header" data-theme="e">
-	                <ul id="scrolly" class="marquee" data-theme="e">
-	                </ul>
-	            </div>
+	            <ul id="scrolly" class="marquee">
+					<li>Loading, please wait...</li>
+                </ul>
             </div>
             <div id="currentView" data-role="content" data-theme="d">
             </div>
@@ -298,16 +325,16 @@
                 <div data-role="navbar" class="sitenav">
                     <ul>
                         <li>
-                            <a href="#" id="home" data-icon="custom"></a>
+                            <a href="#" id="home" data-icon="custom">Video</a>
                         </li>
                         <li>
-                            <a href="#" id="prodstats" data-icon="custom"></a>
+                            <a href="#" id="prodstats" data-icon="custom">Production</a>
                         </li>
                         <li>
-                            <a href="#" id="marquee" data-icon="custom"></a>
+                            <a href="#" id="marquee" data-icon="custom">Marquee</a>
                         </li>
                         <li>
-                            <a href="#" id="exit" data-icon="custom"></a>
+                            <a href="#" id="refresh" data-icon="custom">Refresh</a>
                         </li>
                     </ul>
                 </div>
