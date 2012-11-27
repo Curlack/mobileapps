@@ -1,0 +1,33 @@
+<br>
+<ul data-role="listview" data-theme="c" data-divider-theme="e">
+    <li data-role="list-divider" class="ui-corner-top">
+        <h1 style="text-align: center;">Sign In</h1>
+    </li>
+    <li class="ui-corner-bottom">
+        <form id="loginForm" action="javascript:signIn();" method="post">
+            <div>
+                <label for="userfield">Username</label>
+                <input type="text" name="username" maxlength=30 id="userfield"
+                       value=""/>
+                <label for="passfield">Password</label>
+                <input type="password" name="password" maxlength=30 id="passfield"
+                       value=""/>
+            </div>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <a href="javascript:loadSignUpPage();"
+                       data-role="button" data-theme="c"
+                       data-icon="arrow-r">Sign Up</a>
+                </div>
+                <div class="ui-block-b">
+                    <input type="submit" data-theme="b" data-icon="check" value="Sign In"/>
+                </div>
+            </div>
+            <div class="ui-grid-solo">
+                <a href="javascript:loadResetPwdPage();"
+                   data-role="button" data-theme="c"
+                   data-icon="alert">Reset Password</a>
+            </div>
+        </form>
+    </li>
+</ul>

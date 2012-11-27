@@ -1,0 +1,61 @@
+<br>
+<ul data-role="listview" data-theme="c" data-divider-theme="e">
+    <li data-role="list-divider" class="ui-corner-top">
+        <h1 style="text-align: center;">Sign Up</h1>
+    </li>
+    <li class="ui-corner-bottom">
+        <form id="registerForm" action="#" method="post">
+            <div>
+                <label for="userfield">Username</label>
+                <input type="text" name="username" maxlength=30 id="userfield"
+                       value=""/>
+                <label for="passfield">Password</label>
+                <input type="password" name="password" maxlength=30 id="passfield"
+                       value=""/>
+                <label for="emailfield">Email</label>
+                <input type="text" name="email" maxlength=30 id="emailfield"
+                       value=""/>
+
+                <div class="ui-bar">
+                    <br>
+                    <div id="mc">
+                        <p>Draw the shape in the box</p>
+                        <canvas id="mc-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <input type="submit" disabled="disabled" data-theme="b" data-icon="arrow-r" value="Sign Up"/>
+                    <input type="hidden" id="mc-action" value="javascript:signUp();"/>
+                </div>
+                <div class="ui-block-b">
+                    <a href="javascript:loadSignInPage();"
+                       data-role="button" data-theme="c"
+                       data-icon="check">Sign In</a>
+                </div>
+            </div>
+            <div class="ui-grid-solo">
+                <a href="javascript:loadResetPwdPage();"
+                   data-role="button" data-theme="c"
+                   data-icon="alert">Reset Password</a>
+            </div>
+        </form>
+    </li>
+</ul>
+<script type="text/javascript">
+    $('#registerForm').motionCaptcha({
+        // Basics:
+        action:'#mc-action', // the ID of the input containing the form action
+        divId:'#mc', // if you use an ID other than '#mc' for the placeholder, pass it in here
+        cssClass:'.mc-active', // this CSS class is applied to the 'mc' div when the plugin is active
+        canvasId:'#mc-canvas', // the ID of the MotionCAPTCHA canvas element
+        // An array of shape names that you want MotionCAPTCHA to use:
+        shapes:['triangle', 'x', 'rectangle', 'circle', 'check', 'caret', 'zigzag', 'arrow', 'leftbracket', 'rightbracket', 'v', 'delete', 'star', 'pigtail'],
+        // These messages are displayed inside the canvas after a user finishes drawing:
+        errorMsg:'Wrong!',
+        successMsg:'Correct!',
+        // This message is displayed if the user's browser doesn't support canvas:
+        noCanvasMsg:"Your browser doesn't support <canvas>"
+    });
+</script>

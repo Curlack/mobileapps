@@ -1,0 +1,27 @@
+<br>
+<ul data-role="listview" data-theme="c" data-divider-theme="e">
+    <li data-role="list-divider" class="ui-corner-top">
+        <h1 style="text-align: center;">My Account</h1>
+    </li>
+    <li class="ui-corner-bottom">
+		<form action="javascript:saveUserAccount();" method="post">
+			<label for="userfield">Username</label>
+			<input type="text" name="username" maxlength=30 id="userfield" value="" />
+			<label for="passfield">Password</label>
+			<input type="password" name="password" maxlength=30 id="passfield" value="" />
+			<label for="emailfield">Email</label>
+			<input type="text" name="email" maxlength=30 id="emailfield" value=""/>
+			<br>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <input id="btnSave" type="submit" data-theme="b" data-icon="check" value="Save"/>
+                </div>
+                <div class="ui-block-b">
+                    <a href="javascript:signOut();"
+                       data-role="button" data-theme="f"
+                       data-icon="delete">Sign Out</a>
+                </div>
+            </div>
+		</form>
+    </li>
+</ul>
