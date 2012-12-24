@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Curmobilack</title>
+    <title>Production Performance</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="style/basic.css" type="text/css"/>
@@ -10,6 +10,14 @@
     <script type="text/javascript" src="script/jquery.mobile-1.1.1.min.js"></script>
     <script type="text/javascript">
         <!--
+        var plot = null;
+        var timer = null;
+        var delay = (function(){
+            return function(callback, ms){
+                if (timer != null) clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
         $(document).ready(function () {
             var wnd = $(window);
             var wndSize = function () {
@@ -25,6 +33,19 @@
                 prevSize = curSize;
                 // handler code
                 setMarqueeWidth(prevSize);
+
+                delay(function(){
+                    if (plot != null) {
+                        var screenWidth = parseFloat(prevSize.substring(0, prevSize.indexOf("x")));
+                        var screenHeight = parseFloat(prevSize.substring(prevSize.indexOf("x")+1));
+                        screenWidth -= 5;
+                        screenHeight -= ($('#currentView').prev().height() + $('#currentView').next().height() + 35);
+                        if (screenHeight < 300) screenHeight = 300;
+                        $('#prodStatsHist').width(screenWidth);
+                        $('#prodStatsHist').height(screenHeight);
+                        plot.replot();
+                    }
+                },500);
             });
 
             //Button Click Events
@@ -78,7 +99,7 @@
     <div data-role="footer" style="z-index:1500" class="sitenav" data-theme="b" data-position="fixed">
         <div data-role="navbar" class="sitenav">
             <ul id="menu">
-                <li><a href="#" id="home" data-icon="custom">Video</a></li>
+                <li><a href="#" id="home" data-icon="custom">Home</a></li>
                 <li><a href="#" id="prodstats" data-icon="custom">Production</a></li>
                 <li><a href="#" id="marquee" data-icon="custom">Marquee</a></li>
                 <li><a href="#" id="refresh" data-icon="custom">Refresh</a></li>

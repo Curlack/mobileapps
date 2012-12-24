@@ -1,0 +1,49 @@
+<br>
+<ul data-role="listview" data-theme="c" data-divider-theme="e">
+    <li data-role="list-divider" class="ui-corner-top">
+        <h1 style="text-align: center;">{@Title}</h1>
+    </li>
+    <li class="ui-corner-bottom">
+		<form action="javascript:saveOtherUserAccount();" method="post">
+			<input type="hidden" name="userid" id="useridfield" value="" />
+			<label for="userfield">Username</label>
+			<input type="text" name="username" maxlength=30 id="userfield" value="" />
+			<label for="passfield">Password</label>
+			<input type="password" name="password" maxlength=30 id="passfield" value="" />
+			<label for="emailfield">Email</label>
+			<input type="text" name="email" maxlength=30 id="emailfield" value=""/>
+			<fieldset data-role="controlgroup">
+				<legend>User Access</legend>
+				<label for="ironplantfield">Iron Plant</label>
+				<input type="checkbox" name="ironplant" id="ironplantfield">
+				<label for="steelplantfield">Steel Plant</label>
+				<input type="checkbox" name="steelplant" id="steelplantfield">
+				<label for="flatproductsfield">Flat Products</label>
+				<input type="checkbox" name="flatproducts" id="flatproductsfield">
+				<label for="structuralmillfield">Structural Mill</label>
+				<input type="checkbox" name="structuralmill" id="structuralmillfield">
+				<label for="marqueefield">Marquee</label>
+				<input type="checkbox" name="marquee" id="marqueefield">
+				<label for="adminfield">Administrator</label>
+				<input type="checkbox" name="admin" id="adminfield">
+			</fieldset>
+			<label for="validatedfield">Email Validated</label>
+			<select name="validated" id="validatedfield" data-role="slider">
+				<option value="no">No</option>
+				<option value="yes">Yes</option>
+			</select>
+			<br><br>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <a href="javascript:loadUserAccounts(localStorage.getItem('group'));"
+                       data-role="button" data-theme="c"
+                       data-icon="arrow-l">Cancel</a>
+                </div>
+                <div class="ui-block-b">
+                    <input id="btnSave" type="submit" data-theme="b" data-icon="check" value="Save"/>
+                </div>
+            </div>
+			{@AccountManagement}
+		</form>
+    </li>
+</ul>
