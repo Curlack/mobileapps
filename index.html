@@ -39,7 +39,7 @@
                         var screenWidth = parseFloat(prevSize.substring(0, prevSize.indexOf("x")));
                         var screenHeight = parseFloat(prevSize.substring(prevSize.indexOf("x")+1));
                         screenWidth -= 5;
-                        screenHeight -= ($('#currentView').prev().height() + $('#currentView').next().height() + 35);
+                        screenHeight -= ($('#currentView').prev().height() + $('#currentView').next().height() + 35 + 60);
                         if (screenHeight < 300) screenHeight = 300;
                         $('#prodStatsHist').width(screenWidth);
                         $('#prodStatsHist').height(screenHeight);
